@@ -1,13 +1,15 @@
 {
   "name": "on-duty-pro",
-  "private": true,
   "version": "0.0.0",
+  "homepage": "https://vineela2685-droid.github.io/onduty_final",
+  "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite build && vite preview",
-    "deploy": "gh-pages -d dist",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "server": "node server/server.js",
     "server:dev": "nodemon server/server.js"
   },
