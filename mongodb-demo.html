@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MongoDB Connection Demo - OnDuty Pro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 28px;
+            color: white;
+            margin: 0 auto 20px;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .subtitle {
+            color: #94a3b8;
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+        }
+        
+        .status-card {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
+        .status-online {
+            background: #10b981;
+            box-shadow: 0 0 10px #10b981;
+        }
+        
+        .status-offline {
+            background: #ef4444;
+            box-shadow: 0 0 10px #ef4444;
+        }
+        
+        .connection-info {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 10px 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .demo-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        
+        .demo-section h3 {
+            margin-bottom: 20px;
+            color: #667eea;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #94a3b8;
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+        }
+        
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+        
+        .results {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .success { color: #10b981; }
+        .error { color: #ef4444; }
+        .info { color: #3b82f6; }
+        
+        .steps {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        
+        .step {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+        }
+        
+        .step-number {
+            background: #667eea;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        
+        .step-content h4 {
+            margin-bottom: 8px;
+            color: #667eea;
+        }
+        
+        .step-content p {
+            color: #94a3b8;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">OD</div>
+            <h1>OnDuty Pro</h1>
+            <p class="subtitle">MongoDB Connection Demo & Setup Guide</p>
+        </div>
+
+        <div class="status-card">
+            <h2><span class="status-indicator status-offline"></span>MongoDB Connection Status</h2>
+            <p>Currently offline - Backend server not running</p>
+            <div class="connection-info">
+                <strong>Connection String:</strong><br>
+                (use server/.env or environment variable)<br>
+                <code>mongodb+srv://&lt;username&gt;:&lt;password&gt;@&lt;cluster&gt;.mongodb.net/&lt;dbname&gt;?retryWrites=true&w=majority</code>
+            </div>
+            <p><strong>Note:</strong> Replace &lt;db_password&gt; with your actual MongoDB password</p>
+            <p><strong>Quick Start:</strong> Run <code>npm run server:dev</code> to start the backend server</p>
+        </div>
+
+        <div class="steps">
+            <h3>🚀 Setup Instructions</h3>
+            
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h4>Install Dependencies</h4>
+                    <p>Run <code>npm install</code> to install Express, Mongoose, and other backend dependencies</p>
+                </div>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h4>Update Database Password</h4>
+                    <p>Copy <code>server/.env.example</code> to <code>server/.env</code> and set <code>MONGODB_URI</code> to your connection string (preferred):</p>
+                    <pre style="background:#0b1220;color:#9ae6b4;padding:8px;border-radius:6px;">MONGODB_URI=mongodb+srv://&lt;username&gt;:&lt;password&gt;@&lt;cluster&gt;.mongodb.net/onduty?retryWrites=true&w=majority</pre>
+                </div>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h4>Start Backend Server</h4>
+                    <p>Run <code>npm run server:dev</code> to start the Express server with MongoDB connection</p>
+                </div>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <h4>Start Frontend</h4>
+                    <p>In a new terminal, run <code>npm run dev</code> to start the React development server</p>
+                </div>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">5</div>
+                <div class="step-content">
+                    <h4>Test Connection</h4>
+                    <p>Log in as an instructor/admin and click "MongoDB Test" to verify the connection</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h3>🧪 MongoDB Test Interface</h3>
+            <p>This interface will be available once the backend server is running.</p>
+            
+            <div class="form-group">
+                <label for="userName">Name:</label>
+                <input type="text" id="userName" placeholder="Enter user name" disabled>
+            </div>
+            
+            <div class="form-group">
+                <label for="userEmail">Email:</label>
+                <input type="email" id="userEmail" placeholder="Enter user email" disabled>
+            </div>
+            
+            <div class="form-group">
+                <label for="userRole">Role:</label>
+                <select id="userRole" disabled>
+                    <option value="user">User</option>
+                    <option value="admin">Admin</option>
+                    <option value="manager">Manager</option>
+                </select>
+            </div>
+            
+            <button class="btn" onclick="createUser()" disabled>Create User</button>
+            <button class="btn" onclick="getAllUsers()" disabled>Get All Users</button>
+            <button class="btn" onclick="testConnection()" disabled>Test Connection</button>
+            
+            <div class="results">
+                <div class="info">Server not running. Start the backend server with <code>npm run server:dev</code> to test MongoDB operations.</div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h3>📊 Expected API Endpoints</h3>
+            <div class="connection-info">
+                <strong>Health Check:</strong> GET /api/health<br>
+                <strong>Get Users:</strong> GET /api/users<br>
+                <strong>Create User:</strong> POST /api/users<br>
+                <strong>Update User:</strong> PUT /api/users/:id<br>
+                <strong>Delete User:</strong> DELETE /api/users/:id
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h3>🔧 Troubleshooting</h3>
+            <ul style="color: #94a3b8; line-height: 1.6; padding-left: 20px;">
+                <li><strong>Connection Error:</strong> Check your MongoDB connection string and password</li>
+                <li><strong>Port Conflict:</strong> Ensure port 5000 is available for the backend server</li>
+                <li><strong>CORS Issues:</strong> Backend is configured to allow requests from the frontend</li>
+                <li><strong>Dependencies:</strong> Make sure all npm packages are properly installed</li>
+                <li><strong>Network:</strong> Verify MongoDB Atlas network access and IP whitelist</li>
+            </ul>
+        </div>
+
+        <div style="text-align: center; margin-top: 40px; padding-top: 30px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+            <p style="color: #94a3b8;">Once the backend server is running, you'll see real-time MongoDB operations here!</p>
+            <button class="btn" onclick="location.reload()">Refresh Page</button>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:5000/api';
+        let isConnected = false;
+
+        // Check MongoDB connection status
+        async function checkConnection() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/health`);
+                if (response.ok) {
+                    const data = await response.json();
+                    updateConnectionStatus(true, 'Connected to MongoDB successfully!');
+                    enableInterface();
+                    return true;
+                } else {
+                    throw new Error('Server responded with error');
+                }
+            } catch (error) {
+                updateConnectionStatus(false, 'Backend server not running. Please start the server with: npm run server:dev');
+                disableInterface();
+                return false;
+            }
+        }
+
+        // Update connection status display
+        function updateConnectionStatus(connected, message) {
+            const statusIndicator = document.querySelector('.status-indicator');
+            const statusText = document.querySelector('.status-card p');
+            
+            if (connected) {
+                statusIndicator.className = 'status-indicator status-online';
+                isConnected = true;
+            } else {
+                statusIndicator.className = 'status-indicator status-offline';
+                isConnected = false;
+            }
+            
+            statusText.textContent = message;
+        }
+
+        // Enable/disable interface elements
+        function enableInterface() {
+            document.getElementById('userName').disabled = false;
+            document.getElementById('userEmail').disabled = false;
+            document.getElementById('userRole').disabled = false;
+            
+            document.querySelectorAll('.btn').forEach(btn => btn.disabled = false);
+        }
+
+        function disableInterface() {
+            document.getElementById('userName').disabled = true;
+            document.getElementById('userEmail').disabled = true;
+            document.getElementById('userRole').disabled = true;
+            
+            document.querySelectorAll('.btn').forEach(btn => btn.disabled = true);
+        }
+
+        // Create a new user
+        async function createUser() {
+            if (!isConnected) {
+                showResults('❌ Please connect to MongoDB first', 'error');
+                return;
+            }
+
+            const name = document.getElementById('userName').value.trim();
+            const email = document.getElementById('userEmail').value.trim();
+            const role = document.getElementById('userRole').value;
+
+            if (!name || !email) {
+                showResults('❌ Please fill in all required fields', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/users`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ name, email, role })
+                });
+
+                if (response.ok) {
+                    const user = await response.json();
+                    showResults(`✅ User created successfully!\n${JSON.stringify(user, null, 2)}`, 'success');
+                    clearForm();
+                } else {
+                    const error = await response.json();
+                    showResults(`❌ Error: ${error.message}`, 'error');
+                }
+            } catch (error) {
+                showResults(`❌ Network error: ${error.message}`, 'error');
+            }
+        }
+
+        // Get all users
+        async function getAllUsers() {
+            if (!isConnected) {
+                showResults('❌ Please connect to MongoDB first', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/users`);
+                if (response.ok) {
+                    const users = await response.json();
+                    showResults(`📊 Found ${users.length} users:\n${JSON.stringify(users, null, 2)}`, 'success');
+                } else {
+                    const error = await response.json();
+                    showResults(`❌ Error: ${error.message}`, 'error');
+                }
+            } catch (error) {
+                showResults(`❌ Network error: ${error.message}`, 'error');
+            }
+        }
+
+        // Test MongoDB connection
+        async function testConnection() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/health`);
+                if (response.ok) {
+                    const data = await response.json();
+                    showResults(`✅ Connection test successful!\n${JSON.stringify(data, null, 2)}`, 'success');
+                } else {
+                    showResults('❌ Connection test failed', 'error');
+                }
+            } catch (error) {
+                showResults(`❌ Connection test failed: ${error.message}`, 'error');
+            }
+        }
+
+        // Show results in the results area
+        function showResults(message, type) {
+            const results = document.querySelector('.results');
+            const timestamp = new Date().toLocaleTimeString();
+            const resultDiv = document.createElement('div');
+            resultDiv.className = type;
+            resultDiv.innerHTML = `<strong>[${timestamp}]</strong> ${message}`;
+            results.appendChild(resultDiv);
+            results.scrollTop = results.scrollHeight;
+        }
+
+        // Clear form fields
+        function clearForm() {
+            document.getElementById('userName').value = '';
+            document.getElementById('userEmail').value = '';
+            document.getElementById('userRole').value = 'user';
+        }
+
+        // Initialize the interface
+        async function init() {
+            await checkConnection();
+            
+            // Set up event listeners
+            document.querySelector('button[onclick="createUser()"]').onclick = createUser;
+            document.querySelector('button[onclick="getAllUsers()"]').onclick = getAllUsers;
+            document.querySelector('button[onclick="testConnection()"]').onclick = testConnection;
+            
+            // Check connection every 5 seconds
+            setInterval(checkConnection, 5000);
+        }
+
+        // Start the application
+        init();
+    </script>
+</body>
+</html>

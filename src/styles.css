@@ -1,0 +1,68 @@
+body {
+  margin: 0;
+  font-family: "Segoe UI", sans-serif;
+  background: #0f172a;
+  color: #f1f5f9;
+}
+
+/* Navbar */
+.navbar {
+  background: #1e293b;
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.navbar h1 { margin: 0; font-size: 1.4rem; }
+.navbar button {
+  background: #ef4444;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
+}
+
+/* Layout */
+.dashboard {
+  display: flex;
+}
+.sidebar {
+  background: #1e293b;
+  width: 200px;
+  padding: 20px;
+}
+.sidebar ul { list-style: none; padding: 0; }
+.sidebar li { padding: 10px 0; cursor: pointer; }
+
+/* Main */
+.main { flex: 1; padding: 20px; }
+
+/* Cards */
+.card {
+  background: #1e293b;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+/* Table */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+th, td {
+  padding: 10px;
+  border-bottom: 1px solid #334155;
+}
+
+/* Badges */
+.badge { padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; }
+.badge.pending { background: orange; color: black; }
+.badge.approved { background: green; }
+.badge.rejected { background: crimson; }
+
+/* Buttons */
+button.approve { background: green; color: white; margin-right: 6px; }
+button.reject { background: crimson; color: white; }
